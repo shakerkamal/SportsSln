@@ -18,7 +18,7 @@ namespace SportsStore.Controllers {
 
         [HttpPost]
         public IActionResult Checkout(Order order) {
-            if (cart.Lines.Count() == 0) {
+            if (cart.Lines.Count == 0) {
                 ModelState.AddModelError("", "Sorry, your cart is empty!");
             }
             order.Lines = cart.Lines.ToArray();
