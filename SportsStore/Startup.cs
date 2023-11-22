@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SportsStore.Contracts;
 using SportsStore.Extensions;
 using SportsStore.Helpers;
@@ -20,6 +21,7 @@ namespace SportsStore
         {
             services.AddControllersWithViews();
             services.ConfigureDatabase(Configuration);
+            services.ConfigureIdentityDatabase(Configuration);
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddRazorPages();
@@ -28,15 +30,29 @@ namespace SportsStore
             services.AddScoped<Cart>(sp => SessionCart.GetCart(sp));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddServerSideBlazor();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppIdentityDbContext>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsProduction())
+            {
+                app.UseExceptionHandler("/error");
+            }
+            else
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseStatusCodePages();
+            }
             app.UseDeveloperExceptionPage();
             app.UseStatusCodePages();
             app.UseStaticFiles();
             app.UseSession();
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllerRoute("catpage",
@@ -59,6 +75,7 @@ namespace SportsStore
             });
 
             SeedData.EnsurePopulated(app);
+            IdentitySeedData.EnsurePopulated(app);
         }
     }
 }
