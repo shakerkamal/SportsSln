@@ -3,7 +3,7 @@ services:
   sportsstore:
     build: .
     ports:
-      - "5000:5000"
+      - "5002:5002"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
     depends_on:
